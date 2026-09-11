@@ -1,0 +1,11 @@
+(function(){
+'use strict';
+const KEY='gw-analytics-consent';
+function getLang(){try{return (window.GreenWorldLanguage&&GreenWorldLanguage.get())||localStorage.getItem('gw-lang')||'pt'}catch(e){return'pt'}}
+function loadTracker(){if(document.querySelector('script[data-gw-tracker]'))return;const s=document.createElement('script');s.src='assets/js/crm-tracker.js';s.defer=true;s.dataset.gwTracker='1';document.head.appendChild(s)}
+function value(){try{return localStorage.getItem(KEY)}catch(e){return null}}
+function save(v){try{localStorage.setItem(KEY,v)}catch(e){}}
+function text(lang){return lang==='en'?{msg:'We use optional analytics data to understand website interactions and improve commercial service. You can continue with essential functions only.',privacy:'Privacy Policy',accept:'Accept analytics',essential:'Essential only'}:lang==='es'?{msg:'Usamos datos de análisis opcionales para entender las interacciones con el sitio y mejorar la atención comercial. Puede continuar solamente con las funciones esenciales.',privacy:'Política de Privacidad',accept:'Aceptar análisis',essential:'Solo esenciales'}:{msg:'Usamos dados opcionais de análise para entender as interações com o site e melhorar o atendimento comercial. Você pode continuar somente com as funções essenciais.',privacy:'Política de Privacidade',accept:'Aceitar análise',essential:'Somente essenciais'}}
+function render(){if(document.querySelector('.gw-consent'))return;const l=getLang(),x=text(l),box=document.createElement('div');box.className='gw-consent';box.setAttribute('role','dialog');box.setAttribute('aria-live','polite');box.innerHTML='<p>'+x.msg+' <a href="politica-de-privacidade.html">'+x.privacy+'</a></p><div class="gw-consent-actions"><button type="button" data-consent="essential">'+x.essential+'</button><button type="button" data-consent="accept">'+x.accept+'</button></div>';box.addEventListener('click',e=>{const b=e.target.closest('[data-consent]');if(!b)return;const v=b.dataset.consent==='accept'?'accepted':'essential';save(v);box.remove();if(v==='accepted')loadTracker()});document.body.appendChild(box)}
+const v=value();if(v==='accepted')loadTracker();else if(v!=='essential'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render()}
+})();
